@@ -2,10 +2,11 @@ from flask import Flask, render_template_string, request, redirect, url_for, ses
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, NumberRange
+import os
 import secrets
 import hmac
 
-app = Flask(__name__)
+app = Flask(_name_)
 app.secret_key = secrets.token_hex(16)  # Secure session key
 
 
@@ -154,5 +155,7 @@ TASKS_TEMPLATE = """
 </html>
 """
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# Run the app with dynamic port for Render deployment
+if _name_ == "_main_":
+    port = int(os.environ.get("PORT", 10000))  # Default to 10000 for Render
+    app.run(host="0.0.0.0", port=port, debug=True)
