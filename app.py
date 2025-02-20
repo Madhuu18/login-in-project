@@ -6,8 +6,8 @@ import os
 import secrets
 import hmac
 
-app = Flask(_name_)
-app.secret_key = secrets.token_hex(16)  # Secure session key
+app = Flask(__name__)  # Corrected __name__
+app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(16))  # Secure session key
 
 
 # Flask-WTF Login Form with CSRF protection
@@ -21,17 +21,15 @@ class LoginForm(FlaskForm):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = LoginForm()
-
     if form.validate_on_submit():
         user_value = form.username.data
         password_value = form.password.data
 
-        # Secure password check
+        # Secure password check (Recommended: Use hashed passwords in a database)
         if not (1 <= user_value <= 100) or not hmac.compare_digest(password_value, 'Hindustan@123'):
-            error_message = "Invalid Username or Password!"
-            return render_template_string(HTML_TEMPLATE, form=form, error_message=error_message)
+            return render_template_string(HTML_TEMPLATE, form=form, error_message="Invalid Username or Password!")
 
-        session['user_id'] = user_value  # Store user ID in session
+        session['user_id'] = user_value
         return redirect(url_for('dashboard', user_id=user_value))
 
     return render_template_string(HTML_TEMPLATE, form=form, error_message=None)
@@ -41,8 +39,7 @@ def index():
 @app.route('/dashboard/<int:user_id>')
 def dashboard(user_id):
     if 'user_id' not in session or session['user_id'] != user_id:
-        return redirect(url_for('index'))  # Prevent unauthorized access
-
+        return redirect(url_for('index'))
     return render_template_string(DASHBOARD_TEMPLATE, user_id=user_id)
 
 
@@ -50,8 +47,7 @@ def dashboard(user_id):
 @app.route('/tasks')
 def tasks():
     if 'user_id' not in session:
-        return redirect(url_for('index'))  # Prevent unauthorized access
-
+        return redirect(url_for('index'))
     return render_template_string(TASKS_TEMPLATE)
 
 
@@ -156,10 +152,9 @@ TASKS_TEMPLATE = """
 """
 
 # Run the app with dynamic port for Render deployment
-if _name_ == "_main_":
+if __name__ == "__main__":  # Corrected __name__
     port = int(os.environ.get("PORT", 10000))  # Default to 10000 for Render
     app.run(host="0.0.0.0", port=port, debug=True)
-       
 
 
   
