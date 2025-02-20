@@ -6,7 +6,7 @@ import os
 import secrets
 import hmac
 
-app = Flask(_name_)
+app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)  # Secure session key
 
 
@@ -156,6 +156,6 @@ TASKS_TEMPLATE = """
 """
 
 # Run the app with dynamic port for Render deployment
-if _name_ == "_main_":
+if __name__ == "_main_":
     port = int(os.environ.get("PORT", 10000))  # Default to 10000 for Render
     app.run(host="0.0.0.0", port=port, debug=True)
